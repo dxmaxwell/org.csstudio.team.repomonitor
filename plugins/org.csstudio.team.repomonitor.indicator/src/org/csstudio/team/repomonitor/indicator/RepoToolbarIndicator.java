@@ -28,16 +28,23 @@ import org.eclipse.jface.resource.ImageRegistry;
 
 public class RepoToolbarIndicator extends ContributionItem {
 	
-	public static final String CONTRIBUTION_ID = "org.csstudio.frib.repomon.toolbar.indicator";
+	public static final String CONTRIBUTION_ID = "org.csstudio.team.repomonitor.toolbar.indicator";
 	
 	// Could not find a static variable that contained this ID. //
 	public static final String GIT_REPOSITORIES_VIEW_ID = "org.eclipse.egit.ui.RepositoriesView";
 	
 	public static final String DEFAULT_IMAGE = RepoMonitorPlugin.REPO_ERROR_ICON;
 	
+	public static final long INDICATE_BUSY_DELAY = 100L;
+	
+	private IndicateStatusJob indicateStatusJob = new IndicateStatusJob();
+	
+	private IndicateBusyJob indicateBusyJob = new IndicateBusyJob();
+	
 	private ToolItem indicator = null;
 	
 	private Menu indicatorMenu = null;
+	
 	
 	public RepoToolbarIndicator() {
 		super(CONTRIBUTION_ID);
@@ -79,13 +86,8 @@ public class RepoToolbarIndicator extends ContributionItem {
 		m.setText("Repositories");
 		m.addSelectionListener(new GitRepositoryViewSelectionListener());
 
-		RepoMonitorPlugin.getDefault().addMonitorListener(new UpdateRepoMonitorListener());
-	}
-	
-	protected void refresh() {
-		RepoMonitorPlugin.getDefault().updateMonitor();
-	}
-	
+		RepoMonitorPlugin.getDefault().addMonitorListener(new RepoMonitorListener());
+	}	
 	
 	protected class IndicatorSelectionListener extends SelectionAdapter {
 		
@@ -97,7 +99,7 @@ public class RepoToolbarIndicator extends ContributionItem {
 				indicatorMenu.setLocation(point.x, point.y + bounds.height);
 				indicatorMenu.setVisible(true);				
 			} else {
-				refresh();
+				indicateBusyJob.schedule(INDICATE_BUSY_DELAY);
 			}
 		}
 	}
@@ -106,7 +108,7 @@ public class RepoToolbarIndicator extends ContributionItem {
 		
 		@Override
 		public void widgetSelected(SelectionEvent event) {
-			refresh();
+			indicateBusyJob.schedule(INDICATE_BUSY_DELAY);
 		}
 	}
 	
@@ -134,8 +136,20 @@ public class RepoToolbarIndicator extends ContributionItem {
 		}
 	}
 	
+	protected class RepoMonitorListener implements IRepoMonitorListener {
+
+		@Override
+		public void status(RepoStatus status, int commitsAhead, int commitsBehind) {
+			if(indicateStatusJob != null) {
+				indicateStatusJob.setStatus(status);
+				indicateStatusJob.setCommitsAhead(commitsAhead);
+				indicateStatusJob.setCommitsBehind(commitsBehind);
+				indicateStatusJob.schedule();
+			}
+		}
+	}
 	
-	protected class UpdateRepoMonitorListener extends UIJob implements IRepoMonitorListener {
+	protected class IndicateStatusJob extends UIJob {
 
 		private int commitsAhead;
 		
@@ -143,25 +157,26 @@ public class RepoToolbarIndicator extends ContributionItem {
 		
 		private RepoStatus status;
 		
-		public UpdateRepoMonitorListener() {
+		public IndicateStatusJob() {
 			super("Update Repo Monitor Toolbar Indicator Job");
 		}
 
-		
-		@Override
-		public void status(RepoStatus status, int commitsAhead, int commitsBehind) {
-			this.status = status;
+		public void setCommitsAhead(int commitsAhead) {
 			this.commitsAhead = commitsAhead;
-			this.commitsBehind = commitsBehind;
-			schedule();
 		}
-		
-		
+
+		public void setCommitsBehind(int commitsBehind) {
+			this.commitsBehind = commitsBehind;
+		}
+
+		public void setStatus(RepoStatus status) {
+			this.status = status;
+		}
+
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 
 			ImageRegistry imageRegistry = RepoMonitorPlugin.getDefault().getImageRegistry();
-			
 			
 			switch(status) {
 			case SYNC:
@@ -191,8 +206,22 @@ public class RepoToolbarIndicator extends ContributionItem {
 			}
 			
 			return Status.OK_STATUS;
-		}
-		
+		}	
 	}
 	
+	
+	protected class IndicateBusyJob extends UIJob {
+
+		public IndicateBusyJob() {
+			super("Busy Repo Monitor Indicator Job");
+		}
+
+		@Override
+		public IStatus runInUIThread(IProgressMonitor monitor) {
+			ImageRegistry imageRegistry = RepoMonitorPlugin.getDefault().getImageRegistry();
+			setImage(imageRegistry.get(RepoMonitorPlugin.REPO_BUSY_ICON));
+			RepoMonitorPlugin.getDefault().updateMonitor();
+			return Status.OK_STATUS;
+		}
+	}
 }

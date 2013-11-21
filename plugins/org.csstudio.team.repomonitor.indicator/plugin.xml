@@ -7,10 +7,10 @@
             allPopups="false"
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
-               id="org.csstudio.frib.repomon.toolbar">
+               id="org.csstudio.team.repomonitor.toolbar">
             <dynamic
                   class="org.csstudio.team.repomonitor.indicator.RepoToolbarIndicator"
-                  id="org.csstudio.frib.repomon.toolbar.indicator">
+                  id="org.csstudio.team.repomonitor.toolbar.indicator">
             </dynamic>
          </toolbar>
       </menuContribution>

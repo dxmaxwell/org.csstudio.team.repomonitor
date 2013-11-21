@@ -36,9 +36,11 @@ public class RepoMonitorPlugin extends AbstractUIPlugin {
 	
 	public static final String REPO_DIVERGE_ICON = "icons/repo-diverge.gif";
 	
+	public static final String REPO_BUSY_ICON = "icons/repo-busy.gif";
+	
 	public static final long DEFAULT_MONITOR_DELAY = 360000; // 1 hour
 	
-	public static final long START_MONITOR_DELAY = 2000;     // 2 seconds
+	public static final long START_MONITOR_DELAY = 5000;     // 2 seconds
 	
 	public static enum RepoStatus { ERROR, SYNC, AHEAD, BEHIND, DIVERGE }
 	
@@ -82,6 +84,8 @@ public class RepoMonitorPlugin extends AbstractUIPlugin {
 				FileLocator.find(context.getBundle(), new Path(REPO_BEHIND_ICON), null)));
 		getImageRegistry().put(REPO_DIVERGE_ICON, ImageDescriptor.createFromURL(
 				FileLocator.find(context.getBundle(), new Path(REPO_DIVERGE_ICON), null)));	
+		getImageRegistry().put(REPO_BUSY_ICON, ImageDescriptor.createFromURL(
+				FileLocator.find(context.getBundle(), new Path(REPO_BUSY_ICON), null)));	
 	}
 
 	/**
