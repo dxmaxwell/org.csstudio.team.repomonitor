@@ -27,6 +27,10 @@ public class RepoMonitorJob extends Job {
 	
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
+		RepoMonitorPlugin plugin = RepoMonitorPlugin.getDefault();
+		
+		plugin.setBusy();
+		
 		Map<Repository,ArrayList<IProject>> repositories = new HashMap<>();	
 		for(IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
 			RepositoryMapping mapping = RepositoryMapping.getMapping(project);
@@ -51,7 +55,8 @@ public class RepoMonitorJob extends Job {
 		monitor.beginTask("Repository Monitor", repositories.size());
 		
 		if(monitor.isCanceled()) {
-			schedule(RepoMonitorPlugin.getDefault().getMonitorDelay());
+			plugin.setStatus(plugin.getCommitsAhead(), plugin.getCommitsBehind());
+			schedule(plugin.getMonitorDelay());
 			return Status.CANCEL_STATUS;
 		}
 		
@@ -77,13 +82,13 @@ public class RepoMonitorJob extends Job {
 		}
 		
 		if(error) {
-			RepoMonitorPlugin.getDefault().setError();
+			plugin.setError();
 		} else {
-			RepoMonitorPlugin.getDefault().setStatus(trackingBranchAhead, remoteBranchAhead);
+			plugin.setStatus(trackingBranchAhead, remoteBranchAhead);
 		}
 		
 		
-		schedule(RepoMonitorPlugin.getDefault().getMonitorDelay());
+		schedule(plugin.getMonitorDelay());
 		
 		return Status.OK_STATUS;
 	}

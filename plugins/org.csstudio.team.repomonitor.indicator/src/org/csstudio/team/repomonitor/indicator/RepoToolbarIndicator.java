@@ -35,11 +35,7 @@ public class RepoToolbarIndicator extends ContributionItem {
 	
 	public static final String DEFAULT_IMAGE = RepoMonitorPlugin.REPO_ERROR_ICON;
 	
-	public static final long INDICATE_BUSY_DELAY = 100L;
-	
 	private IndicateStatusJob indicateStatusJob = new IndicateStatusJob();
-	
-	private IndicateBusyJob indicateBusyJob = new IndicateBusyJob();
 	
 	private ToolItem indicator = null;
 	
@@ -87,7 +83,7 @@ public class RepoToolbarIndicator extends ContributionItem {
 		m.addSelectionListener(new GitRepositoryViewSelectionListener());
 
 		RepoMonitorPlugin.getDefault().addMonitorListener(new RepoMonitorListener());
-	}	
+	}		
 	
 	protected class IndicatorSelectionListener extends SelectionAdapter {
 		
@@ -99,7 +95,7 @@ public class RepoToolbarIndicator extends ContributionItem {
 				indicatorMenu.setLocation(point.x, point.y + bounds.height);
 				indicatorMenu.setVisible(true);				
 			} else {
-				indicateBusyJob.schedule(INDICATE_BUSY_DELAY);
+				RepoMonitorPlugin.getDefault().updateMonitor();
 			}
 		}
 	}
@@ -108,7 +104,7 @@ public class RepoToolbarIndicator extends ContributionItem {
 		
 		@Override
 		public void widgetSelected(SelectionEvent event) {
-			indicateBusyJob.schedule(INDICATE_BUSY_DELAY);
+			RepoMonitorPlugin.getDefault().updateMonitor();
 		}
 	}
 	
@@ -203,25 +199,13 @@ public class RepoToolbarIndicator extends ContributionItem {
 				setImage(imageRegistry.get(RepoMonitorPlugin.REPO_ERROR_ICON));
 				setToolTipText("Repository Error: See Log for Information");
 				break;
+				
+			case BUSY:
+				setImage(imageRegistry.get(RepoMonitorPlugin.REPO_BUSY_ICON));
+				setToolTipText("Repository: Refreshing");
 			}
 			
 			return Status.OK_STATUS;
 		}	
-	}
-	
-	
-	protected class IndicateBusyJob extends UIJob {
-
-		public IndicateBusyJob() {
-			super("Busy Repo Monitor Indicator Job");
-		}
-
-		@Override
-		public IStatus runInUIThread(IProgressMonitor monitor) {
-			ImageRegistry imageRegistry = RepoMonitorPlugin.getDefault().getImageRegistry();
-			setImage(imageRegistry.get(RepoMonitorPlugin.REPO_BUSY_ICON));
-			RepoMonitorPlugin.getDefault().updateMonitor();
-			return Status.OK_STATUS;
-		}
 	}
 }

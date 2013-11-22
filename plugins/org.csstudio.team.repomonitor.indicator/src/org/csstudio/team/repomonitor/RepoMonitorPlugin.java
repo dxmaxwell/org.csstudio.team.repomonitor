@@ -42,7 +42,7 @@ public class RepoMonitorPlugin extends AbstractUIPlugin {
 	
 	public static final long START_MONITOR_DELAY = 5000;     // 2 seconds
 	
-	public static enum RepoStatus { ERROR, SYNC, AHEAD, BEHIND, DIVERGE }
+	public static enum RepoStatus { ERROR, BUSY, SYNC, AHEAD, BEHIND, DIVERGE }
 	
 	
 	/**
@@ -71,7 +71,6 @@ public class RepoMonitorPlugin extends AbstractUIPlugin {
 	 * Activate the plugin.
 	 */
 	public void start(BundleContext context) throws Exception {
-		getLog().log(new Status(Status.INFO, PLUGIN_ID, "Start Repo Monitor Plugin: " + hashCode()));
 		super.start(context);
 		plugin = this;		
 		getImageRegistry().put(REPO_ERROR_ICON, ImageDescriptor.createFromURL(
@@ -185,6 +184,17 @@ public class RepoMonitorPlugin extends AbstractUIPlugin {
 		status = RepoStatus.ERROR;
 		fireMonitorListeners();
 	}
+	
+	/**
+	 * Set the status of the repository to busy.
+	 * 
+	 * This can be used to indicate to the user that monitoring is active.
+	 */
+	public void setBusy() {
+		status = RepoStatus.BUSY;
+		fireMonitorListeners();
+	}
+	
 	
 	public void addMonitorListener(IRepoMonitorListener listener) {
 		if(listeners.add(listener)) {
