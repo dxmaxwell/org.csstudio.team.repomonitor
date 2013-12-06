@@ -75,7 +75,7 @@ public class RepoToolbarIndicator extends ContributionItem {
 		m = new MenuItem(indicatorMenu, SWT.SEPARATOR);
 		
 		m = new MenuItem(indicatorMenu, SWT.NONE);
-		m.setText("Resources");
+		m.setText("Navigator");
 		m.addSelectionListener(new ResourceNavigatorViewSelectionListener());
 				
 		m = new MenuItem(indicatorMenu, SWT.NONE);
