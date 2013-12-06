@@ -75,8 +75,8 @@ public class RepoToolbarIndicator extends ContributionItem {
 		m = new MenuItem(indicatorMenu, SWT.SEPARATOR);
 		
 		m = new MenuItem(indicatorMenu, SWT.NONE);
-		m.setText("Projects");
-		m.addSelectionListener(new ProjectExplorerViewSelectionListener());
+		m.setText("Resources");
+		m.addSelectionListener(new ResourceNavigatorViewSelectionListener());
 				
 		m = new MenuItem(indicatorMenu, SWT.NONE);
 		m.setText("Repositories");
@@ -108,14 +108,14 @@ public class RepoToolbarIndicator extends ContributionItem {
 		}
 	}
 	
-	protected class ProjectExplorerViewSelectionListener extends SelectionAdapter {
-
-		@Override
+	protected class ResourceNavigatorViewSelectionListener extends SelectionAdapter {
+		
+		@Override  @SuppressWarnings("deprecation")
 		public void widgetSelected(SelectionEvent event) {
 			try {
-				 PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(IPageLayout.ID_PROJECT_EXPLORER);
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(IPageLayout.ID_RES_NAV);
 			} catch(PartInitException e) {
-				RepoMonitorPlugin.getDefault().getLog().log(new Status(Status.ERROR, RepoMonitorPlugin.PLUGIN_ID, "Error showing Project Explorer view", e));
+				RepoMonitorPlugin.getDefault().getLog().log(new Status(Status.ERROR, RepoMonitorPlugin.PLUGIN_ID, "Error showing Resource Navigator view", e));
 			}
 		}
 	}
