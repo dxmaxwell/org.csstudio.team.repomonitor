@@ -40,7 +40,7 @@ public class RepoMonitorPlugin extends AbstractUIPlugin {
 	
 	public static final long DEFAULT_MONITOR_DELAY = 360000; // 1 hour
 	
-	public static final long START_MONITOR_DELAY = 5000;     // 2 seconds
+	public static final long START_MONITOR_DELAY = 30000;    // 30 seconds
 	
 	public static enum RepoStatus { ERROR, BUSY, SYNC, AHEAD, BEHIND, DIVERGE }
 	
